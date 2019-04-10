@@ -14,10 +14,10 @@ export const fetchData = createAction(
   },
 );
 
-export const updateLoading = createAction('module_user_update_loading');
+export const updateLoading = createAction('pages_user_update_loading');
 
 const initialState = {
-  isLoading: true,
+  isLoading: false,
 };
 
 export default handleActions({

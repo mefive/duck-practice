@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import axios from 'axios';
 
-export const fetchUsers = createAction('' +
+export const fetchUsers = createAction(
   'module_user_fetch_users',
   async (dispatch) => {
     const users = (await axios.get('/api/users')).data;
