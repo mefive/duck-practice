@@ -14,10 +14,10 @@ const users = range(50).map(() => ({
 }));
 
 router.get('/', (req, res) => {
-  res.json({
+  setTimeout(() => res.json({
     status: 0,
     data: users,
-  });
+  }), 300);
 });
 
 module.exports = router;
