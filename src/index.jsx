@@ -19,11 +19,12 @@ ReactDOM.render(
   <Provider store={store}>
     <AppBar position="static">
       <Box px={3} py={2}>
-      <Typography variant="h6">
-        Duck
-      </Typography>
+        <Typography variant="h6">
+          Duck
+        </Typography>
       </Box>
     </AppBar>
+
     <Users />
   </Provider>,
   document.getElementById('main'),
