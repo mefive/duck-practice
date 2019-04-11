@@ -1,23 +1,29 @@
 import { createAction, handleActions } from 'redux-actions';
-import { fetchUsers } from '../modules/user';
+import { fetchUsers } from '../modules/users';
+
+const actionPrefix = 'pages_users';
 
 export const fetchData = createAction(
-  'pages_users_fetch_data',
+  `${actionPrefix}_fetch_data`,
   async (dispatch) => {
     dispatch(updateLoading(true));
 
     try {
-      await dispatch(fetchUsers)
+      const ids = await dispatch(fetchUsers).payload;
+      dispatch(updateIds(ids.slice(0, 10)));
     } finally {
       dispatch(updateLoading(false));
     }
   },
 );
 
-export const updateLoading = createAction('pages_user_update_loading');
+export const updateLoading = createAction(`${actionPrefix}_update_loading`);
+
+export const updateIds = createAction(`${actionPrefix}_update_ids`);
 
 const initialState = {
-  isLoading: false,
+  isLoading: true,
+  ids: [],
 };
 
 export default handleActions({
@@ -25,4 +31,9 @@ export default handleActions({
     ...state,
     isLoading: action.payload,
   }),
+
+  [updateIds]: (state, action) => ({
+    ...state,
+    ids: action.payload,
+  })
 }, initialState);

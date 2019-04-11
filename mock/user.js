@@ -17,6 +17,7 @@ router.get('/', (req, res) => {
   setTimeout(() => res.json({
     status: 0,
     data: users,
+    total: 50,
   }), 300);
 });
 

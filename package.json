@@ -41,6 +41,7 @@
     "@material-ui/styles": "next",
     "@material-ui/system": "next",
     "axios": "^0.18.0",
+    "immer": "^2.1.5",
     "jss": "^10.0.0-alpha.3",
     "lodash": "^4.17.11",
     "prop-types": "^15.7.2",
@@ -50,6 +51,7 @@
     "redux": "^4.0.1",
     "redux-actions": "^2.6.5",
     "redux-promise": "^0.6.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0"
   }
 }

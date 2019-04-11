@@ -1,6 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Table from '@material-ui/core/Table';
@@ -10,7 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Avatar from '@material-ui/core/Avatar';
 
-import { fetchData } from './redux/pages/users';
+import { fetchData } from '../redux/pages/users';
 
 class Users extends React.PureComponent {
   static propTypes = {
@@ -19,8 +20,9 @@ class Users extends React.PureComponent {
     dispatch: PropTypes.func,
   };
 
-  componentWillMount() {
-    this.props.dispatch(fetchData)
+  constructor(props) {
+    super(props);
+    this.props.dispatch(fetchData);
   }
 
   render() {
@@ -59,7 +61,7 @@ class Users extends React.PureComponent {
                     <TableCell>{user.firstName}</TableCell>
                     <TableCell>{user.lastName}</TableCell>
                     <TableCell>
-                      <Avatar src={user.avatar} />
+                      <Avatar src={user.avatar}  component="div" />
                     </TableCell>
                     <TableCell>{user.age}</TableCell>
                     <TableCell>{user.phone}</TableCell>
@@ -73,8 +75,14 @@ class Users extends React.PureComponent {
   }
 }
 
+const usersSelector
+  = createSelector(
+    (users, ids) => ids.map(id => users[id]),
+    users => users.filter(user => user != null),
+  );
+
 const mapStateToProps = ({ modules, pages }) => ({
-  users: modules.user.users,
+  users: usersSelector(modules.users, pages.users.ids),
   isLoading: pages.users.isLoading,
 });
 

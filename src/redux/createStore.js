@@ -11,4 +11,4 @@ export default initialState => applyMiddleware(
 )(createStore)(combineReducers({
   modules: combineReducers(modules),
   pages: combineReducers(pages),
-}), initialState);
+}), window.__REDUX_DEVTOOLS_EXTENSION__ != null ? window.__REDUX_DEVTOOLS_EXTENSION__(initialState): initialState);
