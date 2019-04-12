@@ -92,7 +92,7 @@ const usersSelector = createSelector(
 
 const mapStateToProps = ({ modules, pages }) => ({
   users: usersSelector(modules.users.users, pages.users.ids),
-  isLoading: modules.users.isLoading,
+  isLoading: pages.users.isLoading,
   page: pages.users.page,
 });
 

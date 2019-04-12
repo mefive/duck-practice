@@ -12,19 +12,19 @@ const initialState = {
 const {
   loadRequest,
   loadSuccess,
-  loadFailure,
+  loadError,
 } = createActions(
   {},
   'LOAD_REQUEST',
   'LOAD_SUCCESS',
-  'LOAD_FAILURE',
+  'LOAD_ERROR',
   {
     prefix: '@module/users',
   },
 );
 
 export const loadPage = page => async (dispatch) => {
-  dispatch(loadRequest());
+  dispatch(loadRequest);
 
   const size = 5;
 
@@ -42,7 +42,7 @@ export const loadPage = page => async (dispatch) => {
 
     return result;
   } catch (e) {
-    dispatch(loadFailure());
+    dispatch(loadError());
     return [];
   }
 };
@@ -62,7 +62,7 @@ export default handleActions({
     isLoading: false,
   }),
 
-  [loadFailure]: state => ({
+  [loadError]: state => ({
     ...state,
     isLoading: false,
   }),
