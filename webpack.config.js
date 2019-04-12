@@ -27,6 +27,8 @@ module.exports = {
     extensions: ['.js', '.jsx'],
   },
 
+  devtool: 'source-map',
+
   devServer: {
     port: 3000,
     host: '0.0.0.0',
@@ -36,6 +38,6 @@ module.exports = {
   },
 
   plugins: [
-    new HtmlWebpackPlugin()
+    new HtmlWebpackPlugin(),
   ],
 };

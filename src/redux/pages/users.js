@@ -1,39 +1,30 @@
-import { createAction, handleActions } from 'redux-actions';
-import { fetchUsers } from '../modules/users';
+import { createActions, handleActions } from 'redux-actions';
+import { loadPage } from '../modules/users';
 
-const actionPrefix = 'pages_users';
+const initialState = {
+  ids: [],
+  page: 1,
+};
 
-export const fetchData = createAction(
-  `${actionPrefix}_fetch_data`,
-  async (dispatch) => {
-    dispatch(updateLoading(true));
-
-    try {
-      const ids = await dispatch(fetchUsers).payload;
-      dispatch(updateIds(ids.slice(0, 10)));
-    } finally {
-      dispatch(updateLoading(false));
-    }
+const {
+  loadSuccess,
+} = createActions(
+  {},
+  'LOAD_SUCCESS',
+  {
+    prefix: '@page/users',
   },
 );
 
-export const updateLoading = createAction(`${actionPrefix}_update_loading`);
-
-export const updateIds = createAction(`${actionPrefix}_update_ids`);
-
-const initialState = {
-  isLoading: true,
-  ids: [],
+export const loadData = page => async (dispatch) => {
+  const ids = await dispatch(loadPage(page));
+  dispatch(loadSuccess({ ids, page }));
 };
 
 export default handleActions({
-  [updateLoading]: (state, action) => ({
+  [loadSuccess]: (state, { payload }) => ({
     ...state,
-    isLoading: action.payload,
+    ids: payload.ids,
+    page: payload.page,
   }),
-
-  [updateIds]: (state, action) => ({
-    ...state,
-    ids: action.payload,
-  })
 }, initialState);

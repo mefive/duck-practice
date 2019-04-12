@@ -11,21 +11,31 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Avatar from '@material-ui/core/Avatar';
 
-import { fetchData } from '../redux/pages/users';
+import { loadData } from '../redux/pages/users';
 
 class Users extends React.PureComponent {
   static propTypes = {
-    users: PropTypes.array.isRequired,
+    users: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+      avatar: PropTypes.string,
+      age: PropTypes.number,
+      phone: PropTypes.string,
+    })).isRequired,
     isLoading: PropTypes.bool.isRequired,
-    dispatch: PropTypes.func,
+    dispatch: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.props.dispatch(fetchData);
+    props.dispatch(loadData(this.props.page));
   }
 
   render() {
+    const { users, isLoading } = this.props;
+
     return (
       <Paper>
         <Box p={2}>
@@ -41,7 +51,7 @@ class Users extends React.PureComponent {
             </TableHead>
 
             <TableBody>
-              {this.props.isLoading
+              {isLoading
                 ? (
                   <TableRow>
                     <TableCell colSpan={5}>
@@ -56,12 +66,12 @@ class Users extends React.PureComponent {
                     </TableCell>
                   </TableRow>
                 )
-                : this.props.users.map(user => (
+                : users.map(user => (
                   <TableRow key={user.id}>
                     <TableCell>{user.firstName}</TableCell>
                     <TableCell>{user.lastName}</TableCell>
                     <TableCell>
-                      <Avatar src={user.avatar}  component="div" />
+                      <Avatar src={user.avatar} component="div" />
                     </TableCell>
                     <TableCell>{user.age}</TableCell>
                     <TableCell>{user.phone}</TableCell>
@@ -71,19 +81,19 @@ class Users extends React.PureComponent {
           </Table>
         </Box>
       </Paper>
-    )
+    );
   }
 }
 
-const usersSelector
-  = createSelector(
-    (users, ids) => ids.map(id => users[id]),
-    users => users.filter(user => user != null),
-  );
+const usersSelector = createSelector(
+  (users, ids) => ids.map(id => users[id]),
+  users => users.filter(user => user != null),
+);
 
 const mapStateToProps = ({ modules, pages }) => ({
-  users: usersSelector(modules.users, pages.users.ids),
-  isLoading: pages.users.isLoading,
+  users: usersSelector(modules.users.users, pages.users.ids),
+  isLoading: modules.users.isLoading,
+  page: pages.users.page,
 });
 
 export default connect(mapStateToProps)(Users);
