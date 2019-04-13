@@ -22,15 +22,13 @@ const {
   },
 );
 
-export const loadUsers = page => async (dispatch) => {
+export const loadUsers = (page, size = 5) => async (dispatch) => {
   dispatch(loadUsersRequest());
 
-  const size = 5;
-
   try {
-    const { data } = await axios.get('/api/users', {
+    const { data, total } = await axios.get('/api/users', {
       params: {
-        start: (page - 1) * size,
+        start: page * size,
         size,
       },
     });
@@ -39,7 +37,7 @@ export const loadUsers = page => async (dispatch) => {
 
     dispatch(loadUsersSuccess(users));
 
-    return result;
+    return { ids: result, total };
   } catch (e) {
     dispatch(loadUsersError());
     return [];

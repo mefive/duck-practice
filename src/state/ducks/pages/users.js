@@ -3,7 +3,9 @@ import { loadUsers } from '../users';
 
 const initialState = {
   ids: [],
-  page: 1,
+  page: 0,
+  size: 5,
+  total: 0,
 };
 
 export const namespace = '@page/users';
@@ -22,13 +24,15 @@ const {
   },
 );
 
-export const loadData = page => async (dispatch) => {
+export const loadData = (page, size) => async (dispatch) => {
   try {
     dispatch(loadDataRequest());
 
-    const ids = await dispatch(loadUsers(page));
+    const { ids, total } = await dispatch(loadUsers(page, size));
 
-    dispatch(loadDataSuccess({ ids, page }));
+    dispatch(loadDataSuccess({
+      ids, page, size, total,
+    }));
   } catch (e) {
     dispatch(loadDataError(e));
   }
@@ -39,6 +43,7 @@ export default handleActions({
     ...state,
     ids: payload.ids,
     page: payload.page,
-    isLoading: false,
+    size: payload.size,
+    total: payload.total,
   }),
 }, initialState);
