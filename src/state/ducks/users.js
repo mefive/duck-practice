@@ -4,27 +4,26 @@ import { schema, normalize } from 'normalizr';
 
 const userSchema = new schema.Entity('users');
 
-const initialState = {
-  users: {},
-  isLoading: false,
-};
+const initialState = {};
+
+export const namespace = '@users';
 
 const {
-  loadRequest,
-  loadSuccess,
-  loadError,
+  loadUsersRequest,
+  loadUsersSuccess,
+  loadUsersError,
 } = createActions(
   {},
-  'LOAD_REQUEST',
-  'LOAD_SUCCESS',
-  'LOAD_ERROR',
+  'LOAD_USERS_REQUEST',
+  'LOAD_USERS_SUCCESS',
+  'LOAD_USERS_ERROR',
   {
-    prefix: '@module/users',
+    prefix: namespace,
   },
 );
 
-export const loadPage = page => async (dispatch) => {
-  dispatch(loadRequest);
+export const loadUsers = page => async (dispatch) => {
+  dispatch(loadUsersRequest());
 
   const size = 5;
 
@@ -38,32 +37,18 @@ export const loadPage = page => async (dispatch) => {
 
     const { entities: { users }, result } = normalize(data, [userSchema]);
 
-    dispatch(loadSuccess(users));
+    dispatch(loadUsersSuccess(users));
 
     return result;
   } catch (e) {
-    dispatch(loadError());
+    dispatch(loadUsersError());
     return [];
   }
 };
 
 export default handleActions({
-  [loadRequest]: state => ({
+  [loadUsersSuccess]: (state, { payload }) => ({
     ...state,
-    isLoading: true,
-  }),
-
-  [loadSuccess]: (state, { payload }) => ({
-    ...state,
-    users: {
-      ...state.users,
-      ...payload,
-    },
-    isLoading: false,
-  }),
-
-  [loadError]: state => ({
-    ...state,
-    isLoading: false,
+    ...payload,
   }),
 }, initialState);

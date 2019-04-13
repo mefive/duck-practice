@@ -11,7 +11,8 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Avatar from '@material-ui/core/Avatar';
 
-import { loadData } from '../redux/pages/users';
+import { loadData, namespace } from '../state/ducks/pages/users';
+import { pendingSelector } from '../state/selectors';
 
 class Users extends React.PureComponent {
   static propTypes = {
@@ -90,10 +91,14 @@ const usersSelector = createSelector(
   users => users.filter(user => user != null),
 );
 
-const mapStateToProps = ({ modules, pages }) => ({
-  users: usersSelector(modules.users.users, pages.users.ids),
-  isLoading: pages.users.isLoading,
-  page: pages.users.page,
-});
+const mapStateToProps = (state) => {
+  const { pages, users } = state;
+
+  return {
+    users: usersSelector(users, pages.users.ids),
+    isLoading: pendingSelector(state, namespace, 'LOAD_DATA'),
+    page: pages.users.page,
+  };
+};
 
 export default connect(mapStateToProps)(Users);
