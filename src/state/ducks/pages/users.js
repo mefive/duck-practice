@@ -1,5 +1,6 @@
 import { createActions, handleActions } from 'redux-actions';
-import { loadUsers } from '../users';
+import { put, takeLatest } from 'redux-saga/effects';
+import { loadUsersEffects } from '../users';
 
 const initialState = {
   ids: [],
@@ -10,13 +11,14 @@ const initialState = {
 
 export const namespace = '@page/users';
 
-const {
-  loadDataRequest,
+export const {
+  loadData,
   loadDataSuccess,
   loadDataError,
 } = createActions(
-  {},
-  'LOAD_DATA_REQUEST',
+  {
+    LOAD_DATA: [undefined, () => ({ pending: true })],
+  },
   'LOAD_DATA_SUCCESS',
   'LOAD_DATA_ERROR',
   {
@@ -24,19 +26,23 @@ const {
   },
 );
 
-export const loadData = (page, size) => async (dispatch) => {
+export function* loadDataEffects(action) {
+  const { payload: { page, size } } = action;
+
   try {
-    dispatch(loadDataRequest());
+    const { ids, total } = yield loadUsersEffects(action);
 
-    const { ids, total } = await dispatch(loadUsers(page, size));
-
-    dispatch(loadDataSuccess({
+    yield put(loadDataSuccess({
       ids, page, size, total,
     }));
   } catch (e) {
-    dispatch(loadDataError(e));
+    yield put(loadDataError(e));
   }
-};
+}
+
+export function* saga() {
+  yield takeLatest(loadData, loadDataEffects);
+}
 
 export default handleActions({
   [loadDataSuccess]: (state, { payload }) => ({

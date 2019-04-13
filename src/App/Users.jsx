@@ -33,12 +33,16 @@ class Users extends React.PureComponent {
 
     const { page, rowsPerPage } = this.props;
 
-    props.dispatch(loadData(page, rowsPerPage));
+    this.loadData(page, rowsPerPage);
+  }
+
+  loadData(page, size) {
+    this.props.dispatch(loadData({ page, size }));
   }
 
   render() {
     const {
-      users, isLoading, page, rowsPerPage, dispatch, count,
+      users, isLoading, page, rowsPerPage, count,
     } = this.props;
 
     return (
@@ -68,13 +72,14 @@ class Users extends React.PureComponent {
             }]}
             pagination={{
               page,
-              onChangePage: (e, p) => dispatch(loadData(p, rowsPerPage)),
-              onChangeRowsPerPage: e => dispatch(loadData(page, e.target.value)),
+              onChangePage: (e, p) => this.loadData(p, rowsPerPage),
+              onChangeRowsPerPage: e => this.loadData(page, e.target.value),
               count,
               rowsPerPage,
               rowsPerPageOptions: [5, 10, 20],
             }}
             isLoading={isLoading}
+            height={395}
           />
         </Box>
       </Paper>
