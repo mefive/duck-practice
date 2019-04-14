@@ -14,9 +14,9 @@ import { closeUser, saveUser } from '../../state/ducks/pages/users';
 import Form from '../../components/Form';
 
 function UserDialog(props) {
-  const [user, setUser] = React.useState(props.user);
+  const [user, setUser] = React.useState(props.user || {});
 
-  React.useEffect(() => setUser(props.user), [props.user]);
+  React.useEffect(() => setUser(props.user || {}), [props.user]);
 
   const onClose = () => props.dispatch(closeUser());
 
@@ -29,7 +29,8 @@ function UserDialog(props) {
       <DialogTitle
         onClose={onClose}
       >
-        New User
+        {user.id ? 'Modify' : 'New'}
+        &nbsp;User
       </DialogTitle>
 
       <Form

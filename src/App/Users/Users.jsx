@@ -49,6 +49,16 @@ class Users extends React.PureComponent {
 
     return (
       <Paper>
+        <Box p={2} pb={0}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => dispatch(openUser())}
+          >
+            New
+          </Button>
+        </Box>
+
         <Box p={2}>
           <Table
             rowKey="id"
@@ -77,7 +87,7 @@ class Users extends React.PureComponent {
               align: 'center',
               cellRenderer: user => (
                 <Button onClick={() => dispatch(openUser(user))}>
-                  Edit
+                  Modify
                 </Button>
               ),
             }]}
