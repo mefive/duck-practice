@@ -5,11 +5,13 @@ import { createSelector } from 'reselect';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
 
-import Table from '../components/Table';
+import Table from '../../components/Table';
 
-import { loadData, namespace } from '../state/ducks/pages/users';
-import { pendingSelector } from '../state/selectors';
+import { loadData, namespace, openUser } from '../../state/ducks/pages/users';
+import { pendingSelector } from '../../state/selectors';
+import UserDialog from './UserDialog';
 
 class Users extends React.PureComponent {
   static propTypes = {
@@ -42,7 +44,7 @@ class Users extends React.PureComponent {
 
   render() {
     const {
-      users, isLoading, page, rowsPerPage, count,
+      users, isLoading, page, rowsPerPage, count, dispatch,
     } = this.props;
 
     return (
@@ -69,6 +71,15 @@ class Users extends React.PureComponent {
             }, {
               dataKey: 'phone',
               label: 'Phone',
+            }, {
+              dataKey: 'actions',
+              label: 'Actions',
+              align: 'center',
+              cellRenderer: user => (
+                <Button onClick={() => dispatch(openUser(user))}>
+                  Edit
+                </Button>
+              ),
             }]}
             pagination={{
               page,
@@ -82,6 +93,8 @@ class Users extends React.PureComponent {
             height={395}
           />
         </Box>
+
+        <UserDialog />
       </Paper>
     );
   }

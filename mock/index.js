@@ -1,10 +1,12 @@
 const express = require('express');
 const { argv } = require('yargs');
+const bodyParser = require('body-parser');
 
 const user = require('./user');
 
 const app = express();
 
+app.use(bodyParser.urlencoded());
 app.use('/api/users', user);
 
 const PORT = argv.port || 1986;

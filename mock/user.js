@@ -26,4 +26,27 @@ router.get('/', (req, res) => {
   }), 300);
 });
 
+router.post('/', (req, res) => {
+  const params = req.body;
+
+  const user = {
+    id: faker.random.uuid(),
+    firstName: params.firstName,
+    lastName: params.lastName,
+    avatar: params.avatar,
+    age: +params.age,
+    phone: params.phone,
+  };
+
+  users.unshift(user);
+
+  setTimeout(
+    () => res.json({
+      status: 0,
+      data: user,
+    }),
+    300,
+  );
+});
+
 module.exports = router;

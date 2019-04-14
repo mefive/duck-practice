@@ -33,6 +33,7 @@ module.exports = {
   devServer: {
     port: argv.port || 3000,
     host: '0.0.0.0',
+    inline: false,
     proxy: {
       '/api': 'http://localhost:1986',
     },
