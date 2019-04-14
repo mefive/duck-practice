@@ -2,7 +2,10 @@
   "parser": "babel-eslint",
   "extends": ["airbnb"],
   "rules": {
-    "react/destructuring-assignment": 0
+    "react/destructuring-assignment": 0,
+    "import/no-extraneous-dependencies": [
+      "error", { "devDependencies": ["webpack.*.js", "./mock/**/*.*"] }
+    ]
   },
   "env": {
     "browser": true

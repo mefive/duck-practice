@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { argv } = require('yargs');
 
 module.exports = {
   mode: 'development',
@@ -30,7 +31,7 @@ module.exports = {
   devtool: 'source-map',
 
   devServer: {
-    port: 3000,
+    port: argv.port || 3000,
     host: '0.0.0.0',
     proxy: {
       '/api': 'http://localhost:1986',
