@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { createActions, handleActions } from 'redux-actions';
+import { put, takeLatest } from 'redux-saga/effects';
 import { schema, normalize } from 'normalizr';
 
 const userSchema = new schema.Entity('users');
@@ -9,12 +10,13 @@ const initialState = {};
 export const namespace = '@users';
 
 const {
-  loadUsersRequest,
+  loadUsers,
   loadUsersSuccess,
   loadUsersError,
 } = createActions(
-  {},
-  'LOAD_USERS_REQUEST',
+  {
+    LOAD_USERS: [undefined, () => ({ pendng: true })],
+  },
   'LOAD_USERS_SUCCESS',
   'LOAD_USERS_ERROR',
   {
@@ -22,11 +24,9 @@ const {
   },
 );
 
-export const loadUsers = (page, size = 5) => async (dispatch) => {
-  dispatch(loadUsersRequest());
-
+export function* loadUsersEffects({ payload: { page, size } }) {
   try {
-    const { data, total } = await axios.get('/api/users', {
+    const { data, total } = yield axios.get('/api/users', {
       params: {
         start: page * size,
         size,
@@ -35,14 +35,18 @@ export const loadUsers = (page, size = 5) => async (dispatch) => {
 
     const { entities: { users }, result } = normalize(data, [userSchema]);
 
-    dispatch(loadUsersSuccess(users));
+    yield put(loadUsersSuccess(users));
 
     return { ids: result, total };
   } catch (e) {
-    dispatch(loadUsersError());
-    return [];
+    yield put(loadUsersError(e));
+    return null;
   }
-};
+}
+
+export function* saga() {
+  yield takeLatest(loadUsers, loadUsersEffects);
+}
 
 export default handleActions({
   [loadUsersSuccess]: (state, { payload }) => ({
