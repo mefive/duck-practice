@@ -63,7 +63,6 @@
     "redux": "^4.0.1",
     "redux-actions": "^2.6.5",
     "redux-saga": "^1.0.2",
-    "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "styled-components": "^4.2.0"
   },
