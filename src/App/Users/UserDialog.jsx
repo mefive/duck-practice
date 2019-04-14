@@ -10,8 +10,9 @@ import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 
-import { closeUser, saveUser } from '../../state/ducks/pages/users';
+import { closeUser, namespace, saveUser } from '../../state/ducks/pages/users';
 import Form from '../../components/Form';
+import { pendingSelector } from '../../state/selectors';
 
 function UserDialog(props) {
   const [user, setUser] = React.useState(props.user || {});
@@ -110,8 +111,9 @@ function UserDialog(props) {
               <Button
                 onClick={() => props.dispatch(saveUser(user))}
                 color="primary"
+                disabled={props.isSubmitting}
               >
-                Save
+                {props.isSubmitting ? 'Saving' : 'Save'}
               </Button>
             </DialogActions>
           </React.Fragment>
@@ -125,15 +127,22 @@ UserDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   user: PropTypes.shape({}),
   dispatch: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool.isRequired,
 };
 
 UserDialog.defaultProps = {
   user: null,
 };
 
-const mapStateToProps = ({ pages }) => ({
-  open: pages.users.open,
-  user: pages.users.user,
-});
+const mapStateToProps = (state) => {
+  const { users } = state.pages;
+
+  return {
+    open: users.open,
+    user: users.user,
+    isSubmitting: pendingSelector(state, namespace, 'SAVE_USER'),
+  };
+};
+
 
 export default connect(mapStateToProps)(UserDialog);
