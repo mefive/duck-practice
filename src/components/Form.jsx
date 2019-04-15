@@ -21,8 +21,6 @@ class Form extends React.PureComponent {
   };
 
   getFieldDecorator = (name, options = {}) => (item) => {
-    const error = this.state.errors[name];
-
     this.rules[name] = options.rules;
 
     return React.cloneElement(item, {
@@ -43,7 +41,6 @@ class Form extends React.PureComponent {
 
         this.clearError(name);
       },
-      error,
     });
   };
 
@@ -137,12 +134,14 @@ class Form extends React.PureComponent {
 
   render() {
     const { getFieldDecorator, validate } = this;
+    const { errors } = this.state;
 
     this.rules = {};
 
     return this.props.children({
       getFieldDecorator,
       validate,
+      errors,
     });
   }
 }

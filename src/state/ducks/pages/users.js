@@ -1,4 +1,4 @@
-import { createActions, handleActions } from 'redux-actions';
+import { createActions, handleActions, combineActions } from 'redux-actions';
 import { put, takeLatest, select } from 'redux-saga/effects';
 import * as users from '../users';
 import { createAsyncActions } from '../../helpers';
@@ -79,13 +79,11 @@ export default handleActions({
     total: payload.total,
   }),
 
-  [saveUserSuccess]: state => ({ ...state, open: false }),
-
   [openUser]: (state, { payload }) => ({
     ...state,
     open: true,
     user: payload || null,
   }),
 
-  [closeUser]: state => ({ ...state, open: false }),
+  [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false }),
 }, initialState);

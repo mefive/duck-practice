@@ -21,6 +21,12 @@ function UserDialog(props) {
 
   const onClose = () => props.dispatch(closeUser());
 
+  const submit = validate => () => {
+    if (validate() && !props.isSubmitting) {
+      props.dispatch(saveUser(user));
+    }
+  };
+
   return (
     <Dialog
       open={props.open}
@@ -41,10 +47,10 @@ function UserDialog(props) {
           [key]: value,
         })}
       >
-        {({ getFieldDecorator }) => (
+        {({ getFieldDecorator, validate, errors }) => (
           <React.Fragment>
             <DialogContent dividers>
-              <form>
+              <form onSubmit={submit(validate)}>
                 {getFieldDecorator('firstName', {
                   rules: [{
                     required: true,
@@ -54,6 +60,8 @@ function UserDialog(props) {
                     required
                     label="First Name"
                     fullWidth
+                    error={'firstName' in errors}
+                    helperText={errors.firstName}
                   />
                 ))}
 
@@ -109,7 +117,7 @@ function UserDialog(props) {
               </Button>
 
               <Button
-                onClick={() => props.dispatch(saveUser(user))}
+                onClick={submit(validate)}
                 color="primary"
                 disabled={props.isSubmitting}
               >
