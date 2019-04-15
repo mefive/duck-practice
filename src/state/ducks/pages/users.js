@@ -1,6 +1,7 @@
 import { createActions, handleActions } from 'redux-actions';
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, takeLatest, select } from 'redux-saga/effects';
 import * as users from '../users';
+import { createAsyncActions } from '../../helpers';
 
 const initialState = {
   ids: [],
@@ -17,16 +18,7 @@ export const {
   loadData,
   loadDataSuccess,
   loadDataError,
-} = createActions(
-  {
-    LOAD_DATA: [undefined, () => ({ pending: true })],
-  },
-  'LOAD_DATA_SUCCESS',
-  'LOAD_DATA_ERROR',
-  {
-    prefix: namespace,
-  },
-);
+} = createAsyncActions('LOAD_DATA', namespace);
 
 export const {
   openUser,
@@ -44,16 +36,7 @@ export const {
   saveUser,
   saveUserSuccess,
   saveUserError,
-} = createActions(
-  {
-    SAVE_USER: [undefined, () => ({ pending: true })],
-  },
-  'SAVE_USER_SUCCESS',
-  'CLOSE_USER_ERROR',
-  {
-    prefix: namespace,
-  },
-);
+} = createAsyncActions('SAVE_USER', namespace);
 
 export function* loadDataEffects(action) {
   const { payload: { page, size } } = action;
@@ -73,7 +56,10 @@ export function* saveUserEffects(action) {
   try {
     yield users.saveUserEffects(action);
     yield put(saveUserSuccess());
-    yield put(loadData());
+
+    const { page, size } = (yield select()).pages.users;
+
+    yield put(loadData({ page, size }));
   } catch (e) {
     yield put(saveUserError(e));
   }
@@ -81,6 +67,7 @@ export function* saveUserEffects(action) {
 
 export function* saga() {
   yield takeLatest(loadData, loadDataEffects);
+  yield takeLatest(saveUser, saveUserEffects);
 }
 
 export default handleActions({

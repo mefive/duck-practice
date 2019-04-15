@@ -1,8 +1,9 @@
 import axios from 'axios';
 import qs from 'qs';
-import { createActions, handleActions } from 'redux-actions';
+import { handleActions } from 'redux-actions';
 import { put, takeLatest } from 'redux-saga/effects';
 import { schema, normalize } from 'normalizr';
+import { createAsyncActions } from '../helpers';
 
 const userSchema = new schema.Entity('users');
 
@@ -14,31 +15,13 @@ const {
   loadUsers,
   loadUsersSuccess,
   loadUsersError,
-} = createActions(
-  {
-    LOAD_USERS: [undefined, () => ({ pendng: true })],
-  },
-  'LOAD_USERS_SUCCESS',
-  'LOAD_USERS_ERROR',
-  {
-    prefix: namespace,
-  },
-);
+} = createAsyncActions('LOAD_USERS', namespace);
 
 export const {
   saveUser,
   saveUserSuccess,
   saveUserError,
-} = createActions(
-  {
-    SAVE_USER: [undefined, () => ({ pending: true })],
-  },
-  'SAVE_USER_SUCCESS',
-  'CLOSE_USER_ERROR',
-  {
-    prefix: namespace,
-  },
-);
+} = createAsyncActions('SAVE_USER', namespace);
 
 export function* loadUsersEffects({ payload: { page, size } }) {
   try {
@@ -78,6 +61,7 @@ export function* saveUserEffects({ payload }) {
 
 export function* saga() {
   yield takeLatest(loadUsers, loadUsersEffects);
+  yield takeLatest(saveUser, saveUserEffects);
 }
 
 export default handleActions({
