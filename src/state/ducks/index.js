@@ -1,5 +1,6 @@
 import { spawn } from 'redux-saga/effects';
 import { combineReducers } from 'redux';
+import { reducer as form } from 'redux-form';
 
 import pages, { saga as pagesSaga } from './pages';
 import pending, { saga as pendingSaga } from './pending';
@@ -15,4 +16,5 @@ export default combineReducers({
   pages,
   pending,
   users,
+  form,
 });

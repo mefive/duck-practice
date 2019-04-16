@@ -2,10 +2,8 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import Paper from '@material-ui/core/Paper';
+import { Paper, Avatar, Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 
 import Table from '../../components/Table';
 

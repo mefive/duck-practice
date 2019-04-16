@@ -85,5 +85,5 @@ export default handleActions({
     user: payload || null,
   }),
 
-  [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false }),
+  [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false, user: null }),
 }, initialState);

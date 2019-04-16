@@ -99,7 +99,7 @@ class Form extends React.PureComponent {
 
           if (value == null || value === '' || (typeof value === 'string' && value.trim() === '')) {
             if (rule.required) {
-              errors[name] = rule.message || '必填项不能为空';
+              errors[name] = rule.message || 'required';
               break;
             }
           }
@@ -108,14 +108,10 @@ class Form extends React.PureComponent {
 
           if (typeof rule.validator === 'function') {
             if (!rule.validator(value)) {
-              addToError(name, rule.message || '不符合自定义规则');
+              addToError(name, rule.message || 'not valid');
             }
-          } else if (rule.maxLength != null && value.length > rule.maxLength) {
-            addToError(name, rule.message || `不得大于${rule.maxLength}个字符`);
-          } else if (rule.minLength != null && value.length < rule.minLength) {
-            addToError(name, rule.message || `不得少于${rule.minLength}个字符`);
           } else if (rule.regex != null && !rule.regex.test(value)) {
-            addToError(name, rule.message || '格式不正确');
+            addToError(name, rule.message || 'not valid');
           }
         }
       }
