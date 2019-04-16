@@ -8,8 +8,8 @@ import Box from '@material-ui/core/Box';
 import Table from '../../components/Table';
 
 import { loadData, namespace, openUser } from '../../state/ducks/pages/users';
-import { pendingSelector } from '../../state/selectors';
 import UserDialog from './UserDialog';
+import { getPending } from '../../state/ducks/pending';
 
 class Users extends React.PureComponent {
   static propTypes = {
@@ -51,7 +51,7 @@ class Users extends React.PureComponent {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => dispatch(openUser())}
+            onClick={() => dispatch(openUser({ firstName: 'mefive' }))}
           >
             New
           </Button>
@@ -118,7 +118,7 @@ const mapStateToProps = (state) => {
 
   return {
     users: usersSelector(users, pages.users.ids),
-    isLoading: pendingSelector(state, namespace, 'LOAD_DATA'),
+    isLoading: getPending(state, namespace, 'LOAD_DATA'),
     page: pages.users.page,
     count: pages.users.total,
     rowsPerPage: pages.users.size,

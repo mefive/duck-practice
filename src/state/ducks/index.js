@@ -1,16 +1,9 @@
-import { spawn } from 'redux-saga/effects';
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
 
-import pages, { saga as pagesSaga } from './pages';
-import pending, { saga as pendingSaga } from './pending';
-import users, { saga as usersSaga } from './users';
-
-export function* saga() {
-  yield spawn(pagesSaga);
-  yield spawn(pendingSaga);
-  yield spawn(usersSaga);
-}
+import pages from './pages';
+import pending from './pending';
+import users from './users';
 
 export default combineReducers({
   pages,

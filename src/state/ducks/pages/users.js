@@ -1,6 +1,5 @@
 import { createActions, handleActions, combineActions } from 'redux-actions';
-import { put, takeLatest, select } from 'redux-saga/effects';
-import * as users from '../users';
+import * as userActions from '../users';
 import { createAsyncActions } from '../../helpers';
 
 const initialState = {
@@ -15,7 +14,7 @@ const initialState = {
 export const namespace = '@page/users';
 
 export const {
-  loadData,
+  loadDataRequest,
   loadDataSuccess,
   loadDataError,
 } = createAsyncActions('LOAD_DATA', namespace);
@@ -33,42 +32,40 @@ export const {
 );
 
 export const {
-  saveUser,
+  saveUserRequest,
   saveUserSuccess,
   saveUserError,
 } = createAsyncActions('SAVE_USER', namespace);
 
-export function* loadDataEffects(action) {
-  const { payload: { page, size } } = action;
-
+export const loadData = ({ page, size }) => async (dispatch) => {
   try {
-    const { ids, total } = yield users.loadUsersEffects(action);
+    dispatch(loadDataRequest({ page, size }));
 
-    yield put(loadDataSuccess({
+    const { ids, total } = await dispatch(userActions.loadUsers({ page, size }));
+
+    dispatch(loadDataSuccess({
       ids, page, size, total,
     }));
   } catch (e) {
-    yield put(loadDataError(e));
+    dispatch(loadDataError(e));
   }
-}
+};
 
-export function* saveUserEffects(action) {
+export const saveUser = user => async (dispatch, getState) => {
   try {
-    yield users.saveUserEffects(action);
-    yield put(saveUserSuccess());
+    dispatch(saveUserRequest(user));
 
-    const { page, size } = (yield select()).pages.users;
+    await dispatch(userActions.saveUser(user));
 
-    yield put(loadData({ page, size }));
+    dispatch(saveUserSuccess());
+
+    const { page, size } = getState().pages.users;
+
+    dispatch(loadData({ page, size }));
   } catch (e) {
-    yield put(saveUserError(e));
+    dispatch(saveUserError(e));
   }
-}
-
-export function* saga() {
-  yield takeLatest(loadData, loadDataEffects);
-  yield takeLatest(saveUser, saveUserEffects);
-}
+};
 
 export default handleActions({
   [loadDataSuccess]: (state, { payload }) => ({
@@ -79,11 +76,11 @@ export default handleActions({
     total: payload.total,
   }),
 
-  [openUser]: (state, { payload }) => ({
+  [openUser]: (state, { payload: user }) => ({
     ...state,
     open: true,
-    user: payload || null,
+    user: user ? { ...user } : null,
   }),
 
-  [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false, user: null }),
+  [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false }),
 }, initialState);

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
 import { handleActions } from 'redux-actions';
-import { put, takeLatest } from 'redux-saga/effects';
 import { schema, normalize } from 'normalizr';
 import { createAsyncActions } from '../helpers';
 
@@ -12,20 +11,22 @@ const initialState = {};
 export const namespace = '@users';
 
 const {
-  loadUsers,
+  loadUsersRequest,
   loadUsersSuccess,
   loadUsersError,
 } = createAsyncActions('LOAD_USERS', namespace);
 
 export const {
-  saveUser,
+  saveUserRequest,
   saveUserSuccess,
   saveUserError,
 } = createAsyncActions('SAVE_USER', namespace);
 
-export function* loadUsersEffects({ payload: { page, size } }) {
+export const loadUsers = ({ page, size }) => async (dispatch) => {
   try {
-    const { data, total } = yield axios.get('/api/users', {
+    dispatch(loadUsersRequest({ page, size }));
+
+    const { data, total } = await axios.get('/api/users', {
       params: {
         start: page * size,
         size,
@@ -34,35 +35,32 @@ export function* loadUsersEffects({ payload: { page, size } }) {
 
     const { entities: { users }, result } = normalize(data, [userSchema]);
 
-    yield put(loadUsersSuccess(users));
+    dispatch(loadUsersSuccess(users));
 
     return { ids: result, total };
   } catch (e) {
-    yield put(loadUsersError(e));
+    dispatch(loadUsersError(e));
     return null;
   }
-}
+};
 
-export function* saveUserEffects({ payload }) {
+export const saveUser = user => async (dispatch) => {
   const {
     id, firstName, lastName, avatar, age, phone,
-  } = payload;
+  } = user;
 
   try {
-    const user = yield axios.post('/api/users', qs.stringify({
+    dispatch(saveUserRequest(user));
+
+    const userSaved = await axios.post('/api/users', qs.stringify({
       id, firstName, lastName, avatar, age, phone,
     }, { skipNulls: true }));
 
-    yield put(saveUserSuccess(user));
+    dispatch(saveUserSuccess(userSaved));
   } catch (e) {
-    yield put(saveUserError(e));
+    dispatch(saveUserError(e));
   }
-}
-
-export function* saga() {
-  yield takeLatest(loadUsers, loadUsersEffects);
-  yield takeLatest(saveUser, saveUserEffects);
-}
+};
 
 export default handleActions({
   [loadUsersSuccess]: (state, { payload }) => ({

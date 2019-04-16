@@ -15,26 +15,24 @@ import Box from '@material-ui/core/Box';
 
 import {
   closeUser,
-  namespace,
-  // saveUser,
+  saveUser,
 } from '../../state/ducks/pages/users';
-import { pendingSelector } from '../../state/selectors';
 
 const required = value => (value || typeof value === 'number' ? undefined : 'Required');
-const maxLength = max => value => (value && value.length > max ? `Must be ${max} characters or less` : undefined);
-export const minLength = min => value => (value && value.length < min ? `Must be ${min} characters or more` : undefined);
-const maxLength15 = maxLength(15);
-const minLength10 = minLength(10);
 
 function UserField(props) {
+  const { input, meta, label } = props;
+  const invalid = meta.touched && meta.invalid;
+
   return (
     <TextField
-      inputProps={props.input}
-      label={props.label}
+      inputProps={input}
+      value={input.value}
+      label={label}
       fullWidth
-      variant="filled"
-      error={props.meta.invalid}
-      helperText={props.meta.error}
+      variant="outlined"
+      error={invalid}
+      helperText={meta.touched && meta.error}
     />
   );
 }
@@ -45,19 +43,9 @@ UserField.propTypes = {
 };
 
 function UserDialog(props) {
-  const [user, setUser] = React.useState(props.user || {});
-
-  React.useEffect(() => setUser(props.user || {}), [props.user]);
-
   const onClose = () => props.dispatch(closeUser());
 
-  // const submit = validate => (e) => {
-  //   e.preventDefault();
-  //
-  //   if (validate() && !props.isSubmitting) {
-  //     props.dispatch(saveUser(user));
-  //   }
-  // };
+  const submit = user => props.dispatch(saveUser(user));
 
   return (
     <Dialog
@@ -68,21 +56,18 @@ function UserDialog(props) {
       <DialogTitle
         onClose={onClose}
       >
-        {user.id ? 'Modify' : 'New'}
         &nbsp;User
       </DialogTitle>
       <DialogContent dividers>
         <Box py={2}>
-          <Form noValidate onSubmit={props.handleSubmit}>
+          <Form noValidate onSubmit={props.handleSubmit(submit)}>
             <Grid container spacing={2}>
               <Grid item md={6} xs={12}>
                 <Field
                   name="firstName"
                   component={UserField}
-                  props={{
-                    label: 'First Name',
-                  }}
-                  validate={[required, minLength10, maxLength15]}
+                  label="First Name"
+                  validate={[required]}
                 />
               </Grid>
 
@@ -90,12 +75,31 @@ function UserDialog(props) {
                 <Field
                   name="lastName"
                   component={UserField}
-                  props={{
-                    label: 'Last Name',
-                  }}
+                  label="Last Name"
+                  validate={[required]}
+                />
+              </Grid>
+
+              <Grid item md={6} x={12}>
+                <Field
+                  name="age"
+                  component={UserField}
+                  label="Age"
+                  validate={[required]}
+                />
+              </Grid>
+
+              <Grid item md={6} x={12}>
+                <Field
+                  name="phone"
+                  component={UserField}
+                  label="Phone"
+                  validate={[required]}
                 />
               </Grid>
             </Grid>
+
+            <input type="submit" css="display: none" />
           </Form>
         </Box>
       </DialogContent>
@@ -107,11 +111,11 @@ function UserDialog(props) {
 
         <Button
           color="primary"
-          disabled={props.isSubmitting}
+          disabled={props.submitting}
           type="submit"
-          onSubmit={props.handleSubmit}
+          onClick={props.handleSubmit(submit)}
         >
-          {props.isSubmitting ? 'Saving' : 'Save'}
+          {props.submitting ? 'Saving' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>
@@ -121,13 +125,7 @@ function UserDialog(props) {
 UserDialog.propTypes = {
   ...formPropTypes,
   open: PropTypes.bool.isRequired,
-  user: PropTypes.shape({}),
   dispatch: PropTypes.func.isRequired,
-  isSubmitting: PropTypes.bool.isRequired,
-};
-
-UserDialog.defaultProps = {
-  user: null,
 };
 
 const mapStateToProps = (state) => {
@@ -135,9 +133,7 @@ const mapStateToProps = (state) => {
 
   return {
     open: users.open,
-    user: users.user,
-    isSubmitting: pendingSelector(state, namespace, 'SAVE_USER'),
-    initialValues: users.user,
+    initialValues: users.user && { ...users.user, open: users.open },
   };
 };
 

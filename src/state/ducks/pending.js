@@ -1,13 +1,3 @@
-import { takeLatest, put } from 'redux-saga/effects';
-
-function* pendingEffects({ type }) {
-  yield put({ type: `${type}_REQUEST` });
-}
-
-export function* saga() {
-  yield takeLatest(action => action.meta && action.meta.pending, pendingEffects);
-}
-
 export default function pending(state = {}, action) {
   const { type } = action;
 
@@ -23,4 +13,9 @@ export default function pending(state = {}, action) {
   }
 
   return state;
+}
+
+export function getPending(state, namespace, request, castNull = true) {
+  const p = state.pending[`${namespace}/${request}`];
+  return castNull ? !!p : p;
 }
