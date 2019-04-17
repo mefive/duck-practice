@@ -43,24 +43,20 @@ UserField.propTypes = {
 };
 
 function UserDialog(props) {
-  const onClose = () => props.dispatch(closeUser());
-
-  const submit = user => props.dispatch(saveUser(user));
-
   return (
     <Dialog
       open={props.open}
-      onClose={onClose}
+      onClose={props.close}
       fullWidth
     >
       <DialogTitle
-        onClose={onClose}
+        onClose={props.close}
       >
         &nbsp;User
       </DialogTitle>
       <DialogContent dividers>
         <Box py={2}>
-          <Form noValidate onSubmit={props.handleSubmit(submit)}>
+          <Form noValidate onSubmit={props.handleSubmit}>
             <Grid container spacing={2}>
               <Grid item md={6} xs={12}>
                 <Field
@@ -105,7 +101,7 @@ function UserDialog(props) {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>
+        <Button onClick={props.close}>
           Dismiss
         </Button>
 
@@ -113,7 +109,7 @@ function UserDialog(props) {
           color="primary"
           disabled={props.submitting}
           type="submit"
-          onClick={props.handleSubmit(submit)}
+          onClick={props.handleSubmit}
         >
           {props.submitting ? 'Saving' : 'Save'}
         </Button>
@@ -125,7 +121,7 @@ function UserDialog(props) {
 UserDialog.propTypes = {
   ...formPropTypes,
   open: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -137,7 +133,12 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(reduxForm({
+const mapDispatchToProps = dispatch => ({
+  close: () => dispatch(closeUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({
   form: '@page/users/user',
   enableReinitialize: true,
+  onSubmit: (user, dispatch) => dispatch(saveUser(user)),
 })(UserDialog));
