@@ -51,7 +51,7 @@ class Users extends React.PureComponent {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => dispatch(openUser({ firstName: 'mefive' }))}
+            onClick={() => dispatch(openUser())}
           >
             New
           </Button>

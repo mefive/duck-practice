@@ -43,6 +43,8 @@ UserField.propTypes = {
 };
 
 function UserDialog(props) {
+  const user = props.initialValues || {};
+
   return (
     <Dialog
       open={props.open}
@@ -52,6 +54,7 @@ function UserDialog(props) {
       <DialogTitle
         onClose={props.close}
       >
+        {user.id == null ? 'New' : 'Modify'}
         &nbsp;User
       </DialogTitle>
       <DialogContent dividers>
