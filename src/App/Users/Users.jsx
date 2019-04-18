@@ -7,7 +7,7 @@ import Box from '@material-ui/core/Box';
 
 import Table from '../../components/Table';
 
-import { loadData, namespace, openUser } from '../../state/ducks/pages/users';
+import { loadData, namespace, openUser } from '../../state/ducks/page/users';
 import UserDialog from './UserDialog';
 import { getPending } from '../../state/ducks/pending';
 
@@ -114,14 +114,14 @@ const usersSelector = createSelector(
 );
 
 const mapStateToProps = (state) => {
-  const { pages, users } = state;
+  const { page, users } = state;
 
   return {
-    users: usersSelector(users, pages.users.ids),
+    users: usersSelector(users, page.users.ids),
     isLoading: getPending(state, namespace, 'LOAD_DATA'),
-    page: pages.users.page,
-    count: pages.users.total,
-    rowsPerPage: pages.users.size,
+    page: page.users.page,
+    count: page.users.total,
+    rowsPerPage: page.users.size,
   };
 };
 

@@ -16,7 +16,7 @@ import Box from '@material-ui/core/Box';
 import {
   closeUser,
   saveUser,
-} from '../../state/ducks/pages/users';
+} from '../../state/ducks/page/users';
 
 const required = value => (value || typeof value === 'number' ? undefined : 'Required');
 
@@ -98,7 +98,7 @@ function UserDialog(props) {
               </Grid>
             </Grid>
 
-            <input type="submit" css="display: none" />
+            <Box component="input" display="none" type="submit" />
           </Form>
         </Box>
       </DialogContent>
@@ -128,7 +128,7 @@ UserDialog.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-  const { users } = state.pages;
+  const { users } = state.page;
 
   return {
     open: users.open,

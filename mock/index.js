@@ -6,7 +6,7 @@ const user = require('./user');
 
 const app = express();
 
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/users', user);
 
 const PORT = argv.port || 1986;
