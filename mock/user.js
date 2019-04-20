@@ -16,20 +16,30 @@ const generateUser = () => ({
 
 const users = range(5000).map(generateUser);
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   let { start = 0, size = 10 } = req.query;
 
   start = +start;
   size = +size;
 
-  setTimeout(() => res.json({
-    status: 0,
-    data: users.slice(start, start + size),
+  res.data = users.slice(start, start + size);
+  res.meta = {
     total: users.length,
-  }), 300);
+  };
+
+  next();
 });
 
-router.post('/', (req, res) => {
+function checkError(params, next) {
+  if (users.some(u => u.phone === params.phone && u.id !== params.id)) {
+    next({
+      status: 1001,
+      message: 'phone duplicated',
+    });
+  }
+}
+
+router.post('/', (req, res, next) => {
   const params = req.body;
 
   const {
@@ -50,31 +60,44 @@ router.post('/', (req, res) => {
     user = users.find(u => u.id === id);
 
     if (user == null) {
-      res.json({
-        status: 404,
-        message: 'not found',
-      });
-
-      return;
+      next({ status: 404, message: 'not found' });
     }
+
+    checkError(params, next);
 
     merge(user, {
       firstName, lastName, avatar, age, phone,
     });
   } else {
+    checkError(params, next);
+
     user = merge(generateUser(), {
       firstName, lastName, avatar, age, phone,
     });
+
     users.unshift(user);
   }
 
-  setTimeout(
-    () => res.json({
-      status: 0,
-      data: user,
-    }),
-    300,
-  );
+  res.data = user;
+
+  next();
+});
+
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+
+  const index = users.findIndex(u => u.id === id);
+
+  if (index === -1) {
+    next({
+      status: 404,
+      message: 'user not found',
+    });
+  } else {
+    users.splice(index, 1);
+    res.data = 'ok';
+    next();
+  }
 });
 
 module.exports = router;

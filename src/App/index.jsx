@@ -1,9 +1,10 @@
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
-import AppBar from '@material-ui/core/AppBar';
+import {
+  AppBar, Typography, CssBaseline, Container,
+} from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { makeStyles } from '@material-ui/styles';
 
 import Users from './Users';
 
@@ -13,22 +14,45 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export default () => (
-  <React.Fragment>
-    <CssBaseline />
+const useStyles = makeStyles(theme => ({
+  root: props => ({
+    paddingTop: theme.spacing(2) + props.headerHeight,
+  }),
+}));
 
-    <GlobalStyle />
+function App() {
+  const header = React.useRef(null);
+  const [headerHeight, setHeaderHeight] = React.useState(0);
 
-    <AppBar position="static">
-      <Box px={3} py={2}>
-        <Typography variant="h6">
-          Duck
-        </Typography>
-      </Box>
-    </AppBar>
+  React.useEffect(
+    () => setHeaderHeight(header.current.clientHeight),
+    [header.current],
+  );
 
-    <Box p={2}>
-      <Users />
-    </Box>
-  </React.Fragment>
-);
+  const classes = useStyles({ headerHeight });
+
+  return (
+    <React.Fragment>
+      <CssBaseline />
+
+      <GlobalStyle />
+
+      <AppBar position="fixed" innerRef={header}>
+        <Box px={3} py={2}>
+          <Typography variant="h6">
+              Duck
+          </Typography>
+        </Box>
+      </AppBar>
+
+      <Container
+        maxWidth="xl"
+        classes={{ root: classes.root }}
+      >
+        <Users />
+      </Container>
+    </React.Fragment>
+  );
+}
+
+export default App;

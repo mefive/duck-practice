@@ -16,7 +16,7 @@ import Box from '@material-ui/core/Box';
 import {
   closeUser,
   saveUser,
-} from '../../state/ducks/page/users';
+} from '../../state/ducks/view/users';
 
 const required = value => (value || typeof value === 'number' ? undefined : 'Required');
 
@@ -127,14 +127,10 @@ UserDialog.propTypes = {
   close: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  const { users } = state.page;
-
-  return {
-    open: users.open,
-    initialValues: users.user && { ...users.user, open: users.open },
-  };
-};
+const mapStateToProps = ({ view, dao }) => ({
+  open: view.users.open,
+  initialValues: dao.users[view.users.openId],
+});
 
 const mapDispatchToProps = dispatch => ({
   close: () => dispatch(closeUser()),

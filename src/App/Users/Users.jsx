@@ -2,14 +2,24 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Paper, Avatar, Button } from '@material-ui/core';
+import {
+  Paper, Avatar,
+  Button, IconButton,
+  CardActions, CardContent, CardHeader,
+} from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Box from '@material-ui/core/Box';
 
 import Table from '../../components/Table';
 
-import { loadData, namespace, openUser } from '../../state/ducks/page/users';
+import {
+  confirmDeletingReject,
+  confirmDeletingRequest, deleteUser, loadData, namespace, openUser,
+} from '../../state/ducks/view/users';
 import UserDialog from './UserDialog';
 import { getPending } from '../../state/ducks/pending';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 class Users extends React.PureComponent {
   static propTypes = {
@@ -26,6 +36,12 @@ class Users extends React.PureComponent {
     page: PropTypes.number.isRequired,
     count: PropTypes.number.isRequired,
     rowsPerPage: PropTypes.number.isRequired,
+    deletingUser: PropTypes.shape({}),
+    isDeleting: PropTypes.bool.isRequired,
+  };
+
+  static defaultProps = {
+    deletingUser: null,
   };
 
   constructor(props) {
@@ -42,22 +58,22 @@ class Users extends React.PureComponent {
 
   render() {
     const {
-      users, isLoading, page, rowsPerPage, count, dispatch,
+      users, isLoading, page, rowsPerPage, count, dispatch, deletingUser, isDeleting,
     } = this.props;
 
     return (
       <Paper>
-        <Box p={2} pb={0}>
+        <CardHeader title="Users" />
+        <CardActions>
           <Button
-            variant="contained"
             color="primary"
-            onClick={() => dispatch(openUser())}
+            size="large"
+            onClick={() => dispatch(openUser(null))}
           >
-            New
+              New
           </Button>
-        </Box>
-
-        <Box p={2}>
+        </CardActions>
+        <CardContent>
           <Table
             rowKey="id"
             dataSource={users}
@@ -84,9 +100,15 @@ class Users extends React.PureComponent {
               label: 'Actions',
               align: 'center',
               cellRenderer: user => (
-                <Button onClick={() => dispatch(openUser(user))}>
-                  Modify
-                </Button>
+                <React.Fragment>
+                  <IconButton onClick={() => dispatch(openUser(user.id))}>
+                    <EditIcon />
+                  </IconButton>
+
+                  <IconButton onClick={() => dispatch(confirmDeletingRequest(user.id))}>
+                    <DeleteIcon />
+                  </IconButton>
+                </React.Fragment>
               ),
             }]}
             pagination={{
@@ -100,9 +122,26 @@ class Users extends React.PureComponent {
             isLoading={isLoading}
             height={395}
           />
-        </Box>
+        </CardContent>
 
         <UserDialog />
+
+        <ConfirmDialog
+          onClose={() => dispatch(confirmDeletingReject())}
+          open={deletingUser != null}
+          onConfirm={() => dispatch(deleteUser(deletingUser.id))}
+          title="Delete User"
+          confirmText={isDeleting ? 'Deleting' : 'Delete'}
+        >
+          Are you sure you want to delete
+          {' '}
+          {deletingUser && (
+            <Box component="span" fontWeight={600}>
+              {deletingUser.firstName}
+            </Box>
+          )}
+          ?
+        </ConfirmDialog>
       </Paper>
     );
   }
@@ -114,14 +153,16 @@ const usersSelector = createSelector(
 );
 
 const mapStateToProps = (state) => {
-  const { page, users } = state;
+  const { view, dao } = state;
 
   return {
-    users: usersSelector(users, page.users.ids),
+    users: usersSelector(dao.users, view.users.ids),
     isLoading: getPending(state, namespace, 'LOAD_DATA'),
-    page: page.users.page,
-    count: page.users.total,
-    rowsPerPage: page.users.size,
+    page: view.users.page,
+    count: view.users.total,
+    rowsPerPage: view.users.size,
+    deletingUser: dao.users[view.users.deletingId],
+    isDeleting: getPending(state, namespace, 'DELETE_USER'),
   };
 };
 

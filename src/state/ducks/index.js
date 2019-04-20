@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
 
-import page from './page';
+import dao from './dao';
+import view from './view';
 import pending from './pending';
-import users from './users';
 
 export default combineReducers({
-  page,
+  dao,
+  view,
   pending,
-  users,
   form,
 });
