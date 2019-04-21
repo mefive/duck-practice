@@ -22,6 +22,7 @@ router.get('/', (req, res, next) => {
   start = +start;
   size = +size;
 
+
   res.data = users.slice(start, start + size);
   res.meta = {
     total: users.length,

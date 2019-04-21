@@ -1,3 +1,4 @@
+import { takeLatest, put } from 'redux-saga/effects';
 import axios from 'axios';
 import qs from 'qs';
 import { handleActions } from 'redux-actions';
@@ -29,11 +30,9 @@ export const {
   deleteUserError,
 } = createAsyncActions('DELETE_USER', namespace);
 
-export const loadUsers = ({ page, size }) => async (dispatch) => {
+export function* loadUsers({ payload: { page, size } }) {
   try {
-    dispatch(loadUsersRequest({ page, size }));
-
-    const { data, meta: { total } } = await axios.get('/api/users', {
+    const { data, meta: { total } } = yield axios.get('/api/users', {
       params: {
         start: page * size,
         size,
@@ -42,44 +41,47 @@ export const loadUsers = ({ page, size }) => async (dispatch) => {
 
     const { entities: { users }, result } = normalize(data, [userSchema]);
 
-    dispatch(loadUsersSuccess(users));
+    yield put(loadUsersSuccess(users));
 
     return { ids: result, total };
   } catch (e) {
-    dispatch(loadUsersError(e));
-    return null;
+    yield put(loadUsersError(e));
+    throw e;
   }
-};
+}
 
-export const saveUser = user => async (dispatch) => {
+export function* saveUser({ payload: user }) {
   const {
     id, firstName, lastName, avatar, age, phone,
   } = user;
 
   try {
-    dispatch(saveUserRequest(user));
-
-    const userSaved = (await axios.post('/api/users', qs.stringify({
+    const userSaved = (yield axios.post('/api/users', qs.stringify({
       id, firstName, lastName, avatar, age, phone,
     }, { skipNulls: true }))).data;
 
-    dispatch(saveUserSuccess(userSaved));
+    yield put(saveUserSuccess(userSaved));
   } catch (e) {
-    dispatch(saveUserError(e));
+    yield put(saveUserError(e));
     throw e;
   }
-};
+}
 
-export const deleteUser = id => async (dispatch) => {
+export function* deleteUser({ payload: id }) {
   try {
-    dispatch(deleteUserRequest(id));
-    await axios.delete(`/api/users/${id}`);
-    dispatch(deleteUserSuccess(id));
+    yield axios.delete(`/api/users/${id}`);
+    yield put(deleteUserSuccess(id));
   } catch (e) {
-    dispatch(deleteUserError(e));
+    yield put(deleteUserError(e));
     throw e;
   }
-};
+}
+
+export function* saga() {
+  yield takeLatest(loadUsersRequest, loadUsers);
+  yield takeLatest(saveUserRequest, saveUser);
+  yield takeLatest(deleteUserRequest, deleteUser);
+}
 
 export default handleActions({
   [loadUsersSuccess]: (state, { payload }) => ({

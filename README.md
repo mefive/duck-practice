@@ -3,6 +3,7 @@ A example for demonstrating how to implements [ducks modular redux proposal](htt
 
 with...
 + [redux](https://github.com/reduxjs/redux)
++ [redux-saga](https://github.com/redux-saga/redux-saga)
 + [redux-form](https://github.com/erikras/redux-form)
 + [normalizr](https://github.com/paularmstrong/normalizr)
 + [@material-ui](https://github.com/mui-org/material-ui)

@@ -1,8 +1,8 @@
 import { createActions, handleActions, combineActions } from 'redux-actions';
-import { SubmissionError } from 'redux-form';
-import * as userActions from '../dao/users';
+import { stopSubmit, startSubmit } from 'redux-form';
+import { put, takeLatest, select } from 'redux-saga/effects';
+import * as userDao from '../dao/users';
 import { createAsyncActions } from '../../helpers';
-import { getPending } from '../pending';
 
 const initialState = {
   ids: [],
@@ -20,14 +20,14 @@ export const {
   openUser,
   closeUser,
 
-  confirmDeletingRequest,
-  confirmDeletingReject,
+  deletingRequest,
+  deletingCancel,
 } = createActions(
   {},
   'OPEN_USER',
   'CLOSE_USER',
-  'CONFIRM_DELETING_REQUEST',
-  'CONFIRM_DELETING_REJECT',
+  'DELETING_REQUEST',
+  'DELETING_CANCEL',
   {
     prefix: namespace,
   },
@@ -51,62 +51,72 @@ export const {
   deleteUserError,
 } = createAsyncActions('DELETE_USER', namespace);
 
-export const loadData = payload => async (dispatch, getState) => {
-  if (getPending(getState(), namespace, 'LOAD_DATA')) {
-    return;
-  }
+export function* loadData({ payload } = {}) {
+  const state = yield select();
 
-  const state = getState().view.users;
+  const { users } = state.view;
 
-  const { page = state.page, size = state.size } = payload || {};
+  const { page = users.page, size = users.size } = payload || {};
 
   try {
-    dispatch(loadDataRequest({ page, size }));
+    const { ids, total } = yield userDao.loadUsers({
+      payload: {
+        page, size,
+      },
+    });
 
-    const { ids, total } = await dispatch(userActions.loadUsers({ page, size }));
-
-    dispatch(loadDataSuccess({
+    yield put(loadDataSuccess({
       ids, page, size, total,
     }));
   } catch (e) {
-    dispatch(loadDataError(e));
+    yield put(loadDataError(e));
     throw e;
   }
-};
+}
 
-export const saveUser = user => async (dispatch) => {
+export function* saveUser({ payload }) {
   try {
-    dispatch(saveUserRequest(user));
+    yield put(startSubmit(
+      `${namespace}/user`,
+    ));
 
-    await dispatch(userActions.saveUser(user));
+    yield userDao.saveUser({ payload });
 
-    dispatch(saveUserSuccess());
+    yield put(saveUserSuccess());
 
-    dispatch(loadData());
+    yield put(loadDataRequest());
   } catch (e) {
-    dispatch(saveUserError(e));
+    yield put(saveUserError(e));
 
     if (e.status === 1001) {
-      throw new SubmissionError({
-        phone: e.message,
-      });
+      yield put(stopSubmit(
+        `${namespace}/user`,
+        {
+          phone: e.message,
+        },
+      ));
     } else {
       throw e;
     }
   }
-};
+}
 
-export const deleteUser = id => async (dispatch) => {
+export function* deleteUser({ payload }) {
   try {
-    dispatch(deleteUserRequest(id));
-    await dispatch(userActions.deleteUser(id));
-    dispatch(deleteUserSuccess());
-    dispatch(loadData());
+    yield userDao.deleteUser({ payload });
+    yield put(deleteUserSuccess());
+    yield put(loadDataRequest());
   } catch (e) {
-    dispatch(deleteUserError());
+    yield put(deleteUserError());
     throw e;
   }
-};
+}
+
+export function* saga() {
+  yield takeLatest(loadDataRequest, loadData);
+  yield takeLatest(saveUserRequest, saveUser);
+  yield takeLatest(deleteUserRequest, deleteUser);
+}
 
 export default handleActions({
   [loadDataSuccess]: (state, { payload }) => ({
@@ -125,8 +135,8 @@ export default handleActions({
 
   [combineActions(saveUserSuccess, closeUser)]: state => ({ ...state, open: false }),
 
-  [confirmDeletingRequest]: (state, { payload: id }) => ({ ...state, deletingId: id }),
+  [deletingRequest]: (state, { payload: id }) => ({ ...state, deletingId: id }),
 
-  [combineActions(deleteUserSuccess, confirmDeletingReject)]:
+  [combineActions(deleteUserSuccess, deletingCancel)]:
     state => ({ ...state, deletingId: null }),
 }, initialState);

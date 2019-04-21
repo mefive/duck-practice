@@ -15,7 +15,8 @@ import Box from '@material-ui/core/Box';
 
 import {
   closeUser,
-  saveUser,
+  saveUserRequest,
+  namespace,
 } from '../../state/ducks/view/users';
 
 const required = value => (value || typeof value === 'number' ? undefined : 'Required');
@@ -137,7 +138,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({
-  form: '@page/users/user',
+  form: `${namespace}/user`,
   enableReinitialize: true,
-  onSubmit: (user, dispatch) => dispatch(saveUser(user)),
+  onSubmit: (user, dispatch) => dispatch(saveUserRequest(user)),
 })(UserDialog));

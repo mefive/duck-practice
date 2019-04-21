@@ -1,13 +1,19 @@
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
+import { spawn } from 'redux-saga/effects';
 
-import dao from './dao';
-import view from './view';
-import pending from './pending';
+import dao, { saga as daoSaga } from './dao';
+import view, { saga as viewSaga } from './view';
+import loading from './loading';
+
+export function* saga() {
+  yield spawn(daoSaga);
+  yield spawn(viewSaga);
+}
 
 export default combineReducers({
   dao,
   view,
-  pending,
+  loading,
   form,
 });

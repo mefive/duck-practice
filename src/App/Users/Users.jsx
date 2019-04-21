@@ -14,11 +14,15 @@ import Box from '@material-ui/core/Box';
 import Table from '../../components/Table';
 
 import {
-  confirmDeletingReject,
-  confirmDeletingRequest, deleteUser, loadData, namespace, openUser,
+  deletingCancel,
+  deletingRequest,
+  deleteUserRequest,
+  loadDataRequest,
+  namespace,
+  openUser,
 } from '../../state/ducks/view/users';
 import UserDialog from './UserDialog';
-import { getPending } from '../../state/ducks/pending';
+import { getLoading } from '../../state/ducks/loading';
 import ConfirmDialog from '../../components/ConfirmDialog';
 
 class Users extends React.PureComponent {
@@ -53,7 +57,9 @@ class Users extends React.PureComponent {
   }
 
   loadData(page, size) {
-    this.props.dispatch(loadData({ page, size }));
+    if (!this.props.isLoading) {
+      this.props.dispatch(loadDataRequest({ page, size }));
+    }
   }
 
   render() {
@@ -67,7 +73,6 @@ class Users extends React.PureComponent {
         <CardActions>
           <Button
             color="primary"
-            size="large"
             onClick={() => dispatch(openUser(null))}
           >
               New
@@ -105,7 +110,7 @@ class Users extends React.PureComponent {
                     <EditIcon />
                   </IconButton>
 
-                  <IconButton onClick={() => dispatch(confirmDeletingRequest(user.id))}>
+                  <IconButton onClick={() => dispatch(deletingRequest(user.id))}>
                     <DeleteIcon />
                   </IconButton>
                 </React.Fragment>
@@ -127,9 +132,9 @@ class Users extends React.PureComponent {
         <UserDialog />
 
         <ConfirmDialog
-          onClose={() => dispatch(confirmDeletingReject())}
+          onClose={() => dispatch(deletingCancel())}
           open={deletingUser != null}
-          onConfirm={() => dispatch(deleteUser(deletingUser.id))}
+          onConfirm={() => dispatch(deleteUserRequest(deletingUser.id))}
           title="Delete User"
           confirmText={isDeleting ? 'Deleting' : 'Delete'}
         >
@@ -157,12 +162,12 @@ const mapStateToProps = (state) => {
 
   return {
     users: usersSelector(dao.users, view.users.ids),
-    isLoading: getPending(state, namespace, 'LOAD_DATA'),
+    isLoading: getLoading(state, namespace, 'LOAD_DATA'),
     page: view.users.page,
     count: view.users.total,
     rowsPerPage: view.users.size,
     deletingUser: dao.users[view.users.deletingId],
-    isDeleting: getPending(state, namespace, 'DELETE_USER'),
+    isDeleting: getLoading(state, namespace, 'DELETE_USER'),
   };
 };
 

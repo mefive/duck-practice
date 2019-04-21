@@ -8,7 +8,9 @@ axios.interceptors.response.use(
       return res.data;
     }
 
-    throw res.data;
+    const err = { ...res.data, url: res.config.url };
+
+    throw err;
   },
   (res) => { throw res.response; },
 );

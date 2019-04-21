@@ -1,4 +1,4 @@
-export default function pending(state = {}, action) {
+export default function loading(state = {}, action) {
   const { type } = action;
 
   const matches = /^(.*)_(REQUEST|SUCCESS|ERROR)$/.exec(type);
@@ -15,7 +15,7 @@ export default function pending(state = {}, action) {
   return state;
 }
 
-export function getPending(state, namespace, request, castNull = true) {
-  const p = state.pending[`${namespace}/${request}`];
+export function getLoading(state, namespace, request, castNull = true) {
+  const p = state.loading[`${namespace}/${request}`];
   return castNull ? !!p : p;
 }
