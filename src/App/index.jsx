@@ -7,6 +7,7 @@ import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/styles';
 
 import Users from './Users';
+import Notifications from './Notifications';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -51,6 +52,8 @@ function App() {
       >
         <Users />
       </Container>
+
+      <Notifications />
     </React.Fragment>
   );
 }
