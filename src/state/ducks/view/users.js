@@ -3,6 +3,7 @@ import { stopSubmit, startSubmit } from 'redux-form';
 import { put, takeLatest, select } from 'redux-saga/effects';
 import * as userDao from '../dao/users';
 import { createAsyncActions } from '../../helpers';
+import { NOTIFICATION_TYPE_INFO, pushNotification } from '../notifications';
 
 const initialState = {
   ids: [],
@@ -83,6 +84,11 @@ export function* saveUser({ payload }) {
     yield userDao.saveUser({ payload });
 
     yield put(saveUserSuccess());
+
+    yield put(pushNotification({
+      type: NOTIFICATION_TYPE_INFO,
+      message: 'Save Success!',
+    }));
 
     yield put(loadDataRequest());
   } catch (e) {
