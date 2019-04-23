@@ -1,9 +1,8 @@
 import { createActions, handleActions } from 'redux-actions';
 import {
-  take, takeLatest, put, race,
+  take, takeLatest, put, race, delay,
 } from 'redux-saga/effects';
 import uniqueId from 'lodash/uniqueId';
-import { sleep } from '../helpers';
 
 export const namespace = '@notifications';
 
@@ -31,7 +30,7 @@ const initialState = [];
 
 function* handlePush({ payload: { id } }) {
   const result = yield race({
-    timeout: sleep(3000),
+    timeout: delay(3000),
     remove: take(action => action.type === removeNotification().type
       && action.payload === id),
   });
