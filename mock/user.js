@@ -41,6 +41,11 @@ function checkError(params, next) {
       status: 1001,
       message: 'phone duplicated',
     });
+  } else {
+    next({
+      status: 1002,
+      message: 'some error ops',
+    });
   }
 }
 

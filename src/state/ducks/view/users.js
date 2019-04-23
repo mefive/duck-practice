@@ -104,6 +104,8 @@ export function* saveUser({ payload }) {
     } else {
       throw e;
     }
+  } finally {
+    yield put(stopSubmit(`${namespace}/user`));
   }
 }
 

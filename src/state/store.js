@@ -22,6 +22,8 @@ const sagaMiddleware = createSagaMiddleware({
       type: NOTIFICATION_TYPE_ERROR,
       message,
     }));
+
+    sagaMiddleware.run(saga);
   },
 });
 
