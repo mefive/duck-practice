@@ -3,7 +3,7 @@ import { stopSubmit, startSubmit } from 'redux-form';
 import { put, takeLatest, select } from 'redux-saga/effects';
 import * as userDao from '../dao/users';
 import { createAsyncActions } from '../../helpers';
-import { NOTIFICATION_TYPE_INFO, pushNotification } from '../notifications';
+import { NOTIFICATION_TYPE_SUCCESS, pushNotification } from '../notifications';
 
 const initialState = {
   ids: [],
@@ -86,8 +86,8 @@ export function* saveUser({ payload }) {
     yield put(saveUserSuccess());
 
     yield put(pushNotification({
-      type: NOTIFICATION_TYPE_INFO,
-      message: 'Save Success!',
+      type: NOTIFICATION_TYPE_SUCCESS,
+      message: 'Save Success',
     }));
 
     yield put(loadDataRequest());
@@ -110,7 +110,13 @@ export function* saveUser({ payload }) {
 export function* deleteUser({ payload }) {
   try {
     yield userDao.deleteUser({ payload });
+
     yield put(deleteUserSuccess());
+
+    yield put(pushNotification({
+      type: NOTIFICATION_TYPE_SUCCESS,
+      message: 'Delete Success',
+    }));
     yield put(loadDataRequest());
   } catch (e) {
     yield put(deleteUserError());

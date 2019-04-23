@@ -3,11 +3,33 @@ import * as PropTypes from 'prop-types';
 import { Slide, SnackbarContent, IconButton } from '@material-ui/core';
 import { Close as CloseIcon } from '@material-ui/icons';
 import Box from '@material-ui/core/Box';
+import { green, amber } from '@material-ui/core/colors';
+import { makeStyles } from '@material-ui/core/styles';
 import { TransitionGroup } from 'react-transition-group';
 import { connect } from 'react-redux';
 import { removeNotification } from '../state/ducks/notifications';
 
+const useStyles = makeStyles(theme => ({
+  success: {
+    backgroundColor: green[600],
+  },
+  error: {
+    backgroundColor: theme.palette.error.dark,
+  },
+  info: {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  warning: {
+    backgroundColor: amber[700],
+  },
+  icon: {
+    fontSize: 18,
+  },
+}));
+
 function Notifications(props) {
+  const classes = useStyles();
+
   return (
     <Box position="fixed" bottom={0} left={0} mx={2} my={2}>
       <TransitionGroup>
@@ -15,7 +37,10 @@ function Notifications(props) {
           <Slide direction="right" key={notification.id}>
             <Box mt={1}>
               <SnackbarContent
-                message={notification.message}
+                classes={{
+                  root: classes[notification.type],
+                }}
+                message={notification.message.split(/\r\n/g).map(msg => <div key={msg}>{msg}</div>)}
                 action={[
                   <IconButton
                     color="inherit"
@@ -24,7 +49,11 @@ function Notifications(props) {
                     }}
                     key="close"
                   >
-                    <CloseIcon />
+                    <CloseIcon
+                      classes={{
+                        root: classes.icon,
+                      }}
+                    />
                   </IconButton>,
                 ]}
               />

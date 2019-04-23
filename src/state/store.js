@@ -11,11 +11,16 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 let dispatch;
 
 const sagaMiddleware = createSagaMiddleware({
-  onError(error, errorInfo) {
-    console.log(error, errorInfo);
+  onError(error) {
+    let { message } = error;
+
+    if (error.url) {
+      message = `${error.url}\r\n${message}`;
+    }
+
     dispatch(pushNotification({
       type: NOTIFICATION_TYPE_ERROR,
-      message: error.message || error.url,
+      message,
     }));
   },
 });

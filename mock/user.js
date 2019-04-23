@@ -22,6 +22,11 @@ router.get('/', (req, res, next) => {
   start = +start;
   size = +size;
 
+  // next({
+  //   status: 404,
+  //   message: 'not found',
+  // });
+
   res.data = users.slice(start, start + size);
   res.meta = {
     total: users.length,

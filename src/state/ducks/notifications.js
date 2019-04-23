@@ -7,8 +7,9 @@ import { sleep } from '../helpers';
 
 export const namespace = '@notifications';
 
-export const NOTIFICATION_TYPE_ERROR = 'Error';
-export const NOTIFICATION_TYPE_INFO = 'Info';
+export const NOTIFICATION_TYPE_ERROR = 'error';
+export const NOTIFICATION_TYPE_INFO = 'info';
+export const NOTIFICATION_TYPE_SUCCESS = 'success';
 
 export const {
   pushNotification,
@@ -31,7 +32,8 @@ const initialState = [];
 function* handlePush({ payload: { id } }) {
   const result = yield race({
     timeout: sleep(3000),
-    remove: take(removeNotification),
+    remove: take(action => action.type === removeNotification().type
+      && action.payload === id),
   });
 
   if ('timeout' in result) {
