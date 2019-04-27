@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import {
   Paper, Avatar,
   Button, IconButton,
-  CardActions, CardContent, CardHeader,
+  CardHeader,
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -69,65 +69,66 @@ class Users extends React.PureComponent {
 
     return (
       <Paper>
-        <CardHeader title="Users" />
-        <CardActions>
-          <Button
-            color="primary"
-            onClick={() => dispatch(openUser(null))}
-          >
+        <CardHeader
+          title="Users"
+          action={(
+            <Button
+              color="primary"
+              onClick={() => dispatch(openUser(null))}
+            >
               New
-          </Button>
-        </CardActions>
-        <CardContent>
-          <Table
-            rowKey="id"
-            dataSource={users}
-            columns={[{
-              dataKey: 'firstName',
-              label: 'First Name',
-            }, {
-              dataKey: 'lastName',
-              label: 'Last Name',
-            }, {
-              dataKey: 'avatar',
-              label: 'Avatar',
-              cellRenderer: record => (
-                <Avatar src={record.avatar} />
-              ),
-            }, {
-              dataKey: 'age',
-              label: 'Age',
-            }, {
-              dataKey: 'phone',
-              label: 'Phone',
-            }, {
-              dataKey: 'actions',
-              label: 'Actions',
-              align: 'center',
-              cellRenderer: user => (
-                <React.Fragment>
-                  <IconButton onClick={() => dispatch(openUser(user.id))}>
-                    <EditIcon />
-                  </IconButton>
+            </Button>
+          )}
+        />
 
-                  <IconButton onClick={() => dispatch(deletingRequest(user.id))}>
-                    <DeleteIcon />
-                  </IconButton>
-                </React.Fragment>
-              ),
-            }]}
-            pagination={{
-              page,
-              onChangePage: (e, p) => this.loadData(p, rowsPerPage),
-              onChangeRowsPerPage: e => this.loadData(page, e.target.value),
-              count,
-              rowsPerPage,
-              rowsPerPageOptions: [5, 10, 20],
-            }}
-            isLoading={isLoading}
-            height={395}
-          />
-        </CardContent>
+        <Table
+          rowKey="id"
+          dataSource={users}
+          columns={[{
+            dataKey: 'firstName',
+            label: 'First Name',
+          }, {
+            dataKey: 'lastName',
+            label: 'Last Name',
+          }, {
+            dataKey: 'avatar',
+            label: 'Avatar',
+            cellRenderer: record => (
+              <Avatar src={record.avatar} />
+            ),
+          }, {
+            dataKey: 'age',
+            label: 'Age',
+          }, {
+            dataKey: 'phone',
+            label: 'Phone',
+          }, {
+            dataKey: 'actions',
+            label: 'Actions',
+            align: 'center',
+            cellRenderer: user => (
+              <React.Fragment>
+                <IconButton onClick={() => dispatch(openUser(user.id))}>
+                  <EditIcon />
+                </IconButton>
+
+                <IconButton onClick={() => dispatch(deletingRequest(user.id))}>
+                  <DeleteIcon />
+                </IconButton>
+              </React.Fragment>
+            ),
+          }]}
+          pagination={{
+            page,
+            onChangePage: (e, p) => this.loadData(p, rowsPerPage),
+            onChangeRowsPerPage: e => this.loadData(page, e.target.value),
+            count,
+            rowsPerPage,
+            rowsPerPageOptions: [5, 10, 20],
+          }}
+          isLoading={isLoading}
+          height={395}
+        />
 
         <UserDialog />
 

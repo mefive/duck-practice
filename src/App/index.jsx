@@ -47,7 +47,7 @@ function App() {
       </AppBar>
 
       <Container
-        maxWidth="xl"
+        maxWidth="lg"
         classes={{ root: classes.root }}
       >
         <Users />
